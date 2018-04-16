@@ -18,32 +18,57 @@ So if your answer is 1198233847, then just type 1198233847 in the space provided
 [TIP: before submitting, first test the correctness of your program on some small test files or your own devising.
  Then post your best test cases to the discussion forums to help your fellow students!]'''
 
-with open('clw2_split_inv.txt') as f:
+lines = []
+with open('c1w2_split_inv.txt') as f:
     lines = f.readlines()
-
 
 def count_inv(nums):
     n = len(nums)
+    print('LENGTH : {}'.format(n))
 
-    subarray1 = nums[:n/2]
-    subarray2 = nums[n/2:]
+    if n <= 1 :
+    	return 0, nums
 
-    sorted_array1, left_inv = count_inv(subarray1)
-    sorted_array2, right_inv = count_inv(subarray2)
-    split_inv = 0
+    sorted_all = []
+    subarray1 = nums[: n/2]
+    subarray2 = nums[n/2 : ]
+    count_left, sorted_left = count_inv(subarray1)
+    count_right, sorted_right = count_inv(subarray2)
+    count_split = 0
 
-    return left_inv + right_inv + split_inv
+    l = 0
+    r = 0
+    while (l < len(sorted_left) and r < len(sorted_right)) :
+    	if sorted_left[l] < sorted_right[r]:
+    		sorted_all.append(sorted_left[l])
+    		l += 1
+    	elif sorted_left[l] > sorted_right[r]:
+    		sorted_all.append(sorted_right[r])
+    		r += 1
+    		count_split += len(sorted_left) - l
+    	else:
+    		sorted_all.append(sorted_left[l])
+    		sorted_all.append(sorted_right[r])
+    		l += 1
+    		r += 1
+
+    # if all elements of right half have been copied, add the left elements as such
+    while l < len(sorted_left):
+    	sorted_all.append(sorted_left[l])
+    	l += 1
+
+    # if all elements of left half have been copied, add the right elements as such
+    while r < len(sorted_right):
+    	sorted_all.append(sorted_right[r])
+    	r += 1
 
 
-def merge_sort(nums):
-    n = len(nums)
+    return (count_left + count_right + count_split), sorted_all
 
-    subarray1 = nums[:n / 2]
-    subarray2 = nums[n / 2:]
-    sorted_array = []
+lines = map(int, lines)
+# lines = [1,3,5,2,4,6,0]
+# lines = [1, 1, 2, 1]
 
-    sorted_array1, left_inv = count_inv(subarray1)
-    sorted_array2, right_inv = count_inv(subarray2)
-    split_inv = 0
+total_invs, merge_sorted_nums = count_inv(lines)
 
-    return sorted_array
+print('Result: {}'.format(total_invs))
